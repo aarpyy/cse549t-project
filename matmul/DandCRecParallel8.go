@@ -2,7 +2,7 @@ package matmul
 
 import "sync"
 
-func MatrixMultiplyDandCRecParallel(a, b [][]int, n int) [][]int {
+func MatrixMultiplyDandCRecParallel8(a, b [][]int, n int) [][]int {
 	if len(a[0]) != len(b) {
 		panic("Matrix dimensions do not match for multiplication")
 	}
@@ -35,35 +35,35 @@ func MatrixMultiplyDandCRecParallel(a, b [][]int, n int) [][]int {
 	var x1, x2, x3, x4, x5, x6, x7, x8 [][]int
 	go func() {
 		defer wg.Done()
-		x1 = MatrixMultiplyDandCRecParallel(a11, b11, m)
+		x1 = MatrixMultiplyDandCRecParallel8(a11, b11, m)
 	}()
 	go func() {
 		defer wg.Done()
-		x2 = MatrixMultiplyDandCRecParallel(a12, b21, m)
+		x2 = MatrixMultiplyDandCRecParallel8(a12, b21, m)
 	}()
 	go func() {
 		defer wg.Done()
-		x3 = MatrixMultiplyDandCRecParallel(a11, b12, m)
+		x3 = MatrixMultiplyDandCRecParallel8(a11, b12, m)
 	}()
 	go func() {
 		defer wg.Done()
-		x4 = MatrixMultiplyDandCRecParallel(a12, b22, m)
+		x4 = MatrixMultiplyDandCRecParallel8(a12, b22, m)
 	}()
 	go func() {
 		defer wg.Done()
-		x5 = MatrixMultiplyDandCRecParallel(a21, b11, m)
+		x5 = MatrixMultiplyDandCRecParallel8(a21, b11, m)
 	}()
 	go func() {
 		defer wg.Done()
-		x6 = MatrixMultiplyDandCRecParallel(a22, b21, m)
+		x6 = MatrixMultiplyDandCRecParallel8(a22, b21, m)
 	}()
 	go func() {
 		defer wg.Done()
-		x7 = MatrixMultiplyDandCRecParallel(a21, b12, m)
+		x7 = MatrixMultiplyDandCRecParallel8(a21, b12, m)
 	}()
 	go func() {
 		defer wg.Done()
-		x8 = MatrixMultiplyDandCRecParallel(a22, b22, m)
+		x8 = MatrixMultiplyDandCRecParallel8(a22, b22, m)
 	}()
 	wg.Wait()
 

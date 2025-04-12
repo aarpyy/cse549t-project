@@ -29,9 +29,9 @@ func main() {
 	log.Println("Nested For Loop MM running time: ", runTime.Nanoseconds())
 	log.Println("Matrix multiplication check passed.")
 
-	startTime2 := time.Now()
+	startTime = time.Now()
 	c = matmul.MatrixMultiplyDandCRec(a, b, len(a))
-	runTime = time.Since(startTime2)
+	runTime = time.Since(startTime)
 
 	if !matmul.CheckMatMul(a, b, c) {
 		panic("Matrix multiplication Divide and Conquer check failed")
@@ -40,17 +40,27 @@ func main() {
 	log.Println("Divide and Conquer MM running time: ", runTime.Nanoseconds())
 	log.Println("Matrix multiplication check passed.")
 
-	startTime3 := time.Now()
-	c = matmul.MatrixMultiplyDandCRecParallel(a, b, len(a))
-	runTime = time.Since(startTime3)
+	startTime = time.Now()
+	c = matmul.MatrixMultiplyDandCRecParallel8(a, b, len(a))
+	runTime = time.Since(startTime)
 
 	if !matmul.CheckMatMul(a, b, c) {
-		panic("Matrix multiplication Divide and Conquer Parallel check failed")
+		panic("Matrix multiplication Divide and Conquer 8x Parallel check failed")
 	}
 
-	log.Println("Divide and Conquer Parallel MM running time: ", runTime.Nanoseconds())
+	log.Println("Divide and Conquer 8x Parallel MM running time: ", runTime.Nanoseconds())
 	log.Println("Matrix multiplication check passed.")
 
+	startTime = time.Now()
+	c = matmul.MatrixMultiplyDandCRecParallel4(a, b, len(a))
+	runTime = time.Since(startTime)
+
+	if !matmul.CheckMatMul(a, b, c) {
+		panic("Matrix multiplication Divide and Conquer 4x Parallel check failed")
+	}
+
+	log.Println("Divide and Conquer 4x Parallel MM running time: ", runTime.Nanoseconds())
+	log.Println("Matrix multiplication check passed.")
 
 	// -----------------------------------------------------
 	// Merge-Sort Algorithms
@@ -79,5 +89,4 @@ func main() {
 
 	log.Println("P Merge Sort running time: ", runTime.Nanoseconds())
 	log.Println("P Merge Sort check passed.")
-
 }
