@@ -3,6 +3,7 @@ package main
 import (
 	"cse549t-project/matmul"
 	"cse549t-project/matrix"
+	"cse549t-project/mergesort"
 	"log"
 	"runtime"
 	"time"
@@ -49,4 +50,34 @@ func main() {
 
 	log.Println("Divide and Conquer Parallel MM running time: ", runTime.Nanoseconds())
 	log.Println("Matrix multiplication check passed.")
+
+
+	// -----------------------------------------------------
+	// Merge-Sort Algorithms
+	// -----------------------------------------------------
+
+	d := matrix.MagicMatrix1D(512, 42)
+
+	startTime = time.Now()
+	e := mergesort.MergeSort(d)
+	runTime = time.Since(startTime)
+
+	if !mergesort.CheckSorted(d, e) {
+		panic("Seq. Merge Sort check failed")
+	}
+
+	log.Println("Seq. Merge Sort running time: ", runTime.Nanoseconds())
+	log.Println("Seq. Merge Sort check passed.")
+
+	startTime = time.Now()
+	e = mergesort.PMergeSort(d)
+	runTime = time.Since(startTime)
+
+	if !mergesort.CheckSorted(d, e) {
+		panic("P Merge Sort check failed")
+	}
+
+	log.Println("P Merge Sort running time: ", runTime.Nanoseconds())
+	log.Println("P Merge Sort check passed.")
+
 }
