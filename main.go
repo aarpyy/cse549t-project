@@ -14,53 +14,48 @@ import (
 
 func main() {
 
-	log.Println(runtime.GOMAXPROCS(runtime.NumCPU()))
+	log.Println("Number of Processors:", runtime.GOMAXPROCS(runtime.NumCPU()))
 	a := matrix.MagicMatrix(512, 512, 42)
 	b := matrix.MagicMatrix(512, 512, 42)
+	log.Println("Matrix A Size: ", len(a), "x", len(a[0]))
+	log.Println("Matrix B Size: ", len(b), "x", len(b[0]))
 
+	// Nested For Loop MM
 	startTime := time.Now()
 	c := matmul.MatrixMultiply(a, b)
 	runTime := time.Since(startTime)
-
 	if !matmul.CheckMatMul(a, b, c) {
 		panic("Matrix multiplication check failed")
 	}
-
 	log.Println("Nested For Loop MM running time: ", runTime.Nanoseconds())
-	log.Println("Matrix multiplication check passed.")
 
+	// Divide and Conquer MM
 	startTime = time.Now()
 	c = matmul.MatrixMultiplyDandCRec(a, b, len(a))
 	runTime = time.Since(startTime)
-
 	if !matmul.CheckMatMul(a, b, c) {
 		panic("Matrix multiplication Divide and Conquer check failed")
 	}
-
 	log.Println("Divide and Conquer MM running time: ", runTime.Nanoseconds())
-	log.Println("Matrix multiplication check passed.")
 
+	// 8x Parallel Divide and Conquer MM
 	startTime = time.Now()
 	c = matmul.MatrixMultiplyDandCRecParallel8(a, b, len(a))
 	runTime = time.Since(startTime)
-
 	if !matmul.CheckMatMul(a, b, c) {
 		panic("Matrix multiplication Divide and Conquer 8x Parallel check failed")
 	}
-
 	log.Println("Divide and Conquer 8x Parallel MM running time: ", runTime.Nanoseconds())
-	log.Println("Matrix multiplication check passed.")
 
+	// 4x Parallel Divide and Conquer MM
 	startTime = time.Now()
 	c = matmul.MatrixMultiplyDandCRecParallel4(a, b, len(a))
 	runTime = time.Since(startTime)
-
 	if !matmul.CheckMatMul(a, b, c) {
 		panic("Matrix multiplication Divide and Conquer 4x Parallel check failed")
 	}
-
 	log.Println("Divide and Conquer 4x Parallel MM running time: ", runTime.Nanoseconds())
-	log.Println("Matrix multiplication check passed.")
+	log.Println("All Matrix multiplication checks passed.")
 
 	// -----------------------------------------------------
 	// Merge-Sort Algorithms
