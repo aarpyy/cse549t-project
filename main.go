@@ -272,12 +272,11 @@ func main() {
 		strconv.Itoa(n),
 	}
 	results = append(results, result)
-	})
 
 	// Also compare for slightly smaller than cache size to account for randomness
 	runTime = measurePerformance(func(a, b [][]int) [][]int {
 		return matmul.CacheAwareMM(a, b, matmul.ComputeBlockSize("900KB"))
-	})
+	}, pairs)
 	log.Println("Cache aware matrix multiplication speedup (900KB): ", float64(baseline.Nanoseconds())/float64(runTime.Nanoseconds()))
 	result = []string{
 		time.Now().Format("2006-01-02 15:04:05"),
@@ -295,7 +294,6 @@ func main() {
 		strconv.Itoa(n),
 	}
 	results = append(results, result)
-	})
 
 	// All checks passed
 	log.Println("All Matrix multiplication checks passed.")
