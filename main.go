@@ -91,7 +91,13 @@ func main() {
 	runTime = measurePerformance(func(a, b [][]int) [][]int {
 		return matmul.CacheAwareMM(a, b, matmul.ComputeBlockSize("1MB"))
 	})
-	log.Println("Cache aware matrix multiplication speedup: ", float64(baseline.Nanoseconds())/float64(runTime.Nanoseconds()))
+	log.Println("Cache aware matrix multiplication speedup (1MB): ", float64(baseline.Nanoseconds())/float64(runTime.Nanoseconds()))
+
+	// Also compare for slightly smaller than cache size to account for randomness
+	runTime = measurePerformance(func(a, b [][]int) [][]int {
+		return matmul.CacheAwareMM(a, b, matmul.ComputeBlockSize("900KB"))
+	})
+	log.Println("Cache aware matrix multiplication speedup (900KB): ", float64(baseline.Nanoseconds())/float64(runTime.Nanoseconds()))
 
 	// All checks passed
 	log.Println("All Matrix multiplication checks passed.")

@@ -33,9 +33,9 @@ func ComputeBlockSize(cacheSize string) int {
 
 func blockMM(a, b, c [][]int, i, j, k, blockSize int) {
 	for ii := i; ii < min(i+blockSize, len(a)); ii++ {
-		for jj := j; jj < min(j+blockSize, len(b[0])); jj++ {
-			for kk := k; kk < min(k+blockSize, len(b)); kk++ {
-				c[ii][jj] += a[ii][kk] * b[kk][jj]
+		for jj := j; jj < min(j+blockSize, len(b)); jj++ {
+			for kk := k; kk < min(k+blockSize, len(b[0])); kk++ {
+				c[ii][kk] += a[ii][jj] * b[jj][kk]
 			}
 		}
 	}
@@ -50,9 +50,13 @@ func CacheAwareMM(a, b [][]int, blockSize int) [][]int {
 		result[i] = make([]int, len(b[0]))
 	}
 
-	for i := 0; i < len(a); i += blockSize {
-		for j := 0; j < len(b[0]); j += blockSize {
-			for k := 0; k < len(b); k += blockSize {
+	d1 := len(a)
+	d2 := len(b)
+	d3 := len(b[0])
+
+	for i := 0; i < d1; i += blockSize {
+		for j := 0; j < d2; j += blockSize {
+			for k := 0; k < d3; k += blockSize {
 				blockMM(a, b, result, i, j, k, blockSize)
 			}
 		}
