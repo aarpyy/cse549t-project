@@ -255,7 +255,7 @@ func main() {
 	runTime = measurePerformance(func(a, b [][]int) [][]int {
 		return matmul.CacheAwareMM(a, b, matmul.ComputeBlockSize("1MB"))
 	}, pairs)
-	log.Println("Cache aware matrix multiplication speedup: ", float64(baseline.Nanoseconds())/float64(runTime.Nanoseconds()))
+	log.Println("Cache aware matrix multiplication speedup (1MB): ", float64(baseline.Nanoseconds())/float64(runTime.Nanoseconds()))
 	result = []string{
 		time.Now().Format("2006-01-02 15:04:05"),
 		"MM-CacheAware",
@@ -272,6 +272,30 @@ func main() {
 		strconv.Itoa(n),
 	}
 	results = append(results, result)
+	})
+
+	// Also compare for slightly smaller than cache size to account for randomness
+	runTime = measurePerformance(func(a, b [][]int) [][]int {
+		return matmul.CacheAwareMM(a, b, matmul.ComputeBlockSize("900KB"))
+	})
+	log.Println("Cache aware matrix multiplication speedup (900KB): ", float64(baseline.Nanoseconds())/float64(runTime.Nanoseconds()))
+	result = []string{
+		time.Now().Format("2006-01-02 15:04:05"),
+		"MM-CacheAware",
+		strconv.Itoa(dim1),
+		strconv.Itoa(dim2),
+		strconv.FormatInt(runTime.Nanoseconds(), 10),
+		strconv.FormatFloat(float64(baseline.Nanoseconds())/float64(runTime.Nanoseconds()), 'f', -1, 64),
+		strconv.Itoa(numProc),
+		strconv.Itoa(l1),
+		strconv.Itoa(l2),
+		strconv.Itoa(l3),
+		strconv.Itoa(line),
+		"900KB",
+		strconv.Itoa(n),
+	}
+	results = append(results, result)
+	})
 
 	// All checks passed
 	log.Println("All Matrix multiplication checks passed.")
