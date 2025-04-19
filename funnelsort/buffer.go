@@ -26,17 +26,15 @@ func NewBuffer(capacity int, in KMerger) Buffer {
 }
 
 type Buffer interface {
-	Next() (int, bool)
+	Consume()
 	Peek() (int, bool)
 }
 
-func (b *leafbuffer) Next() (int, bool) {
+func (b *leafbuffer) Consume() {
 	if len(b.arr) == 0 {
-		return 0, false
+		return
 	}
-	v := b.arr[0]
 	b.arr = b.arr[1:]
-	return v, true
 }
 
 func (b *leafbuffer) Peek() (int, bool) {
@@ -57,17 +55,11 @@ func (b *buffer) fill() {
 	}
 }
 
-func (b *buffer) Next() (int, bool) {
+func (b *buffer) Consume() {
 	if len(b.arr) == 0 {
-		b.fill()
-		if len(b.arr) == 0 {
-			return 0, false
-		}
+		return
 	}
-
-	v := b.arr[0]
 	b.arr = b.arr[1:]
-	return v, true
 }
 
 func (b *buffer) Peek() (int, bool) {

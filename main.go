@@ -37,7 +37,7 @@ func measurePerformance(f func(a, b [][]int) [][]int) time.Duration {
 //TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
 
-func main() {
+func main1() {
 
 	log.Println("Number of Processors:", runtime.GOMAXPROCS(runtime.NumCPU()))
 	a := matrix.MagicMatrix(dim1, dim2, 42)

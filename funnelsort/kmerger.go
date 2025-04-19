@@ -1,6 +1,9 @@
 package funnelsort
 
-import "math"
+import (
+	"math"
+	"sync"
+)
 
 type kmerger struct {
 	k  int
@@ -11,7 +14,7 @@ func NewKMerger(arr [][]int) KMerger {
 	k := len(arr)
 	var in []Buffer
 
-	if k < 20 {
+	if k < 512 {
 		in = make([]Buffer, k)
 		for i := 0; i < k; i++ {
 			in[i] = NewLeafBuffer(arr[i])
@@ -45,15 +48,30 @@ type KMerger interface {
 func (m *kmerger) Next() (int, bool) {
 	var minVal *int
 	minIndex := -1
-	// Iterate over input buffers
+
+	var wg sync.WaitGroup
+	peeked := make([]*int, len(m.in))
 	for i, b := range m.in {
-		v, ok := b.Peek()
-		if !ok {
+		wg.Add(1)
+		go func(i int, b Buffer) {
+			defer wg.Done()
+			if v, ok := b.Peek(); ok {
+				peeked[i] = &v
+			} else {
+				peeked[i] = nil
+			}
+		}(i, b)
+	}
+
+	wg.Wait()
+
+	// Iterate over input buffers
+	for i, v := range peeked {
+		if v == nil {
 			continue
 		}
-
-		if minVal == nil || v < *minVal {
-			minVal = &v
+		if minVal == nil || *v < *minVal {
+			minVal = v
 			minIndex = i
 		}
 	}
@@ -62,7 +80,7 @@ func (m *kmerger) Next() (int, bool) {
 		return 0, false
 	}
 
-	// Pop the minimum value from the buffer
-	m.in[minIndex].Next()
+	// Consume the top value
+	m.in[minIndex].Consume()
 	return *minVal, true
 }
