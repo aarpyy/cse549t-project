@@ -3,12 +3,21 @@ package main
 import (
 	"cse549t-project/funnelsort"
 	"log"
+	"math/rand"
 	"sort"
 	"time"
 )
 
+func randomArray(n int) []int {
+	arr := make([]int, n)
+	for i := 0; i < n; i++ {
+		arr[i] = rand.Intn(n)
+	}
+	return arr
+}
+
 func testCorrectness() {
-	arr := funnelsort.RandomArray(10000)
+	arr := randomArray(10000)
 	sorted := funnelsort.Sort(arr)
 	for i := 1; i < len(sorted); i++ {
 		if sorted[i] < sorted[i-1] {
@@ -22,7 +31,7 @@ func testSpeedup() {
 	// Compare to sort.Ints from average of 100 runs
 	var base time.Duration
 	for i := 0; i < 1; i++ {
-		arr := funnelsort.RandomArray(500000)
+		arr := randomArray(500000)
 		start := time.Now()
 		sort.Ints(arr)
 		base += time.Since(start)
@@ -30,7 +39,7 @@ func testSpeedup() {
 
 	var fs time.Duration
 	for i := 0; i < 1; i++ {
-		arr := funnelsort.RandomArray(500000)
+		arr := randomArray(500000)
 		start := time.Now()
 		funnelsort.Sort(arr)
 		fs += time.Since(start)

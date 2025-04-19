@@ -2,7 +2,6 @@ package funnelsort
 
 import (
 	"math"
-	"math/rand"
 )
 
 func Sort(arr []int) []int {
@@ -33,12 +32,4 @@ func Sort(arr []int) []int {
 	}
 
 	return out
-}
-
-func RandomArray(n int) []int {
-	arr := make([]int, n)
-	for i := 0; i < n; i++ {
-		arr[i] = rand.Intn(n)
-	}
-	return arr
 }
