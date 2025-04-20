@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-func PMergeSort(A []int) []int {
+func ParMergeSort(A []int) []int {
 	if len(A) <= 1 {
 		return A
 	}
