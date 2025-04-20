@@ -23,7 +23,7 @@ func randomArray(n int) []int {
 	return arr
 }
 
-func testCorrectness() {
+func TestCorrectness() {
 	arr := randomArray(s)
 	sorted := funnelsort.Sort(arr)
 	for i := 1; i < len(sorted); i++ {
@@ -34,7 +34,7 @@ func testCorrectness() {
 	log.Println("Array is sorted successfully")
 }
 
-func testSpeedup() {
+func TestSpeedup() {
 	// Compare to sort.Ints from average of 100 runs
 	var base time.Duration
 	for i := 0; i < iterations; i++ {
@@ -53,10 +53,4 @@ func testSpeedup() {
 	}
 
 	log.Printf("Average speedup: %.4f", float64(base)/float64(fs))
-}
-
-func main() {
-	testCorrectness()
-	testSpeedup()
-	log.Println("All tests passed successfully")
 }

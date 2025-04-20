@@ -6,6 +6,7 @@ import (
 	"cse549t-project/mergesort"
 	"log"
 	"runtime"
+	"sort"
 	"time"
 )
 
@@ -37,7 +38,7 @@ func measurePerformance(f func(a, b [][]int) [][]int) time.Duration {
 //TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
 
-func main1() {
+func main() {
 
 	log.Println("Number of Processors:", runtime.GOMAXPROCS(runtime.NumCPU()))
 	a := matrix.MagicMatrix(dim1, dim2, 42)
@@ -106,17 +107,24 @@ func main1() {
 	// Merge-Sort Algorithms
 	// -----------------------------------------------------
 
-	d := matrix.MagicMatrix1D(512, 42)
+	d := matrix.MagicMatrix1D(1000000, 42)
 
 	startTime := time.Now()
 	e := mergesort.MergeSort(d)
 	runTime = time.Since(startTime)
 
+	// Use copy since sort.Ints sorts in-place
+	cpy := make([]int, len(d))
+	copy(cpy, d)
+	startTime = time.Now()
+	sort.Ints(cpy)
+	msBaseline := time.Since(startTime)
+
 	if !mergesort.CheckSorted(d, e) {
 		panic("Seq. Merge Sort check failed")
 	}
 
-	log.Println("Seq. Merge Sort running time: ", runTime.Nanoseconds())
+	log.Println("Seq. Merge Sort speedup: ", float64(msBaseline.Nanoseconds())/float64(runTime.Nanoseconds()))
 	log.Println("Seq. Merge Sort check passed.")
 
 	startTime = time.Now()
@@ -127,6 +135,13 @@ func main1() {
 		panic("P Merge Sort check failed")
 	}
 
-	log.Println("P Merge Sort running time: ", runTime.Nanoseconds())
+	log.Println("P Merge Sort speedup: ", float64(msBaseline.Nanoseconds())/float64(runTime.Nanoseconds()))
 	log.Println("P Merge Sort check passed.")
+
+	// ------------------------------------------------------
+	// Funnelsort
+	// ------------------------------------------------------
+
+	TestSpeedup()
+	TestCorrectness()
 }
