@@ -1,40 +1,19 @@
 package funnelsort
 
 import (
-	"container/heap"
 	"math"
 )
 
-type bufEntry struct {
-	val int
-	buf Buffer
-}
-
-// heap of *bufEntry
-type entryHeap []*bufEntry
-
-func (h entryHeap) Len() int            { return len(h) }
-func (h entryHeap) Less(i, j int) bool  { return h[i].val < h[j].val }
-func (h entryHeap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
-func (h *entryHeap) Push(x interface{}) { *h = append(*h, x.(*bufEntry)) }
-func (h *entryHeap) Pop() interface{} {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[:n-1]
-	return x
-}
-
 type kmerger struct {
-	in   []Buffer
-	heap entryHeap
+	in     []Buffer
+	tree   []int // indices of losers
+	winner int   // index of current winner
 }
 
 func NewKMerger(arr [][]int) KMerger {
 	k := len(arr)
 	var in []Buffer
-
-	if k < 512 {
+	if k < 1020 {
 		in = make([]Buffer, k)
 		for i := range arr {
 			in[i] = NewLeafBuffer(arr[i])
@@ -49,24 +28,15 @@ func NewKMerger(arr [][]int) KMerger {
 			} else {
 				a = arr[i*sqrtK : (i+1)*sqrtK]
 			}
-			m := NewKMerger(a)
-			in[i] = NewBuffer(m)
+			in[i] = NewBuffer(NewKMerger(a))
 		}
 	}
-
-	m := &kmerger{in: in}
-	m.initHeap()
+	m := &kmerger{
+		in:   in,
+		tree: make([]int, k),
+	}
+	m.initTree()
 	return m
-}
-
-func (m *kmerger) initHeap() {
-	m.heap = make(entryHeap, 0, len(m.in))
-	for _, buf := range m.in {
-		if v, ok := buf.Peek(); ok {
-			m.heap = append(m.heap, &bufEntry{val: v, buf: buf})
-		}
-	}
-	heap.Init(&m.heap)
 }
 
 type KMerger interface {
@@ -74,21 +44,65 @@ type KMerger interface {
 	Size() int
 }
 
+func (m *kmerger) initTree() {
+	k := len(m.in)
+	// initialize all tree nodes to -1
+	for i := range m.tree {
+		m.tree[i] = -1
+	}
+	// build tournament
+	for i := 0; i < k; i++ {
+		m.play(i)
+	}
+}
+
+// play takes in the index of a recently consumed buffer and updates the tree so that the new top of this buffer
+// is inserted properly according to the sort order
+func (m *kmerger) play(idx int) {
+	n := len(m.in)
+
+	// Start at the leaf node
+	node := (idx + n) / 2
+	challenger := idx
+
+	// While we aren't at the root
+	for node > 0 {
+		loser := m.tree[node-1]
+		// get values
+		lv, lok := sentinelVal(m.in, loser)
+		cv, cok := sentinelVal(m.in, challenger)
+
+		// If we don't have an index of a loser yet or the valid challenger is less than the valid loser, then swap
+		if loser < 0 || (cv < lv && lok && cok) {
+			m.tree[node-1], challenger = challenger, loser
+		}
+
+		// Use implicit indexing to get the parent node
+		node /= 2
+	}
+	m.winner = challenger
+}
+
+// sentinelVal returns the value of the i-th buffer
+func sentinelVal(in []Buffer, i int) (int, bool) {
+	if i < 0 {
+		return 0, false
+	}
+	return in[i].Peek()
+}
+
 func (m *kmerger) Size() int { return len(m.in) }
 
 func (m *kmerger) Next() (int, bool) {
-	if len(m.heap) == 0 {
+	// If we don't have a winner index, we have no next value
+	if m.winner < 0 {
 		return 0, false
 	}
-	// pop smallest
-	e := heap.Pop(&m.heap).(*bufEntry)
-	val := e.val
-
-	// advance buffer; if more, push new entry
-	e.buf.Consume()
-	if v, ok := e.buf.Peek(); ok {
-		e.val = v
-		heap.Push(&m.heap, e)
+	val, ok := sentinelVal(m.in, m.winner)
+	if !ok {
+		return 0, false
 	}
+	m.in[m.winner].Consume()
+	m.play(m.winner)
 	return val, true
 }
