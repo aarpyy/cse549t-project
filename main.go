@@ -4,49 +4,47 @@ import (
 	"cse549t-project/matmul"
 	"cse549t-project/matrix"
 	"cse549t-project/mergesort"
-	"log"
-	"runtime"
-	"sort"
-	"time"
 	"encoding/csv"
-	"os"
-	"strconv"
 	"github.com/klauspost/cpuid/v2"
+	"log"
+	"os"
+	"runtime"
+	"strconv"
+	"time"
 )
 
 const (
-	n    = 1
-	dim1 = 512
-	dim2 = 512
-	dim3 = 512
+	n        = 1
+	dim1     = 512
+	dim2     = 512
+	dim3     = 512
 	filename = "olivia-laptop"
 )
 
 type MatrixPair struct {
-    A [][]int
-    B [][]int
+	A [][]int
+	B [][]int
 }
 
 // pre-generate 10 random matrix pairs to reduce setup time
 func generateMatrixPairs() []MatrixPair {
-    pairs := make([]MatrixPair, n)
-    for i := 0; i < n; i++ {
-        pairs[i] = MatrixPair{
-            A: matrix.MagicMatrix(dim1, dim2, int(time.Now().UnixNano()+int64(i*3))),
-            B: matrix.MagicMatrix(dim1, dim2, int(time.Now().UnixNano()+int64(i*7))),
-        }
-    }
-    return pairs
+	pairs := make([]MatrixPair, n)
+	for i := 0; i < n; i++ {
+		pairs[i] = MatrixPair{
+			A: matrix.MagicMatrix(dim1, dim2, int(time.Now().UnixNano()+int64(i*3))),
+			B: matrix.MagicMatrix(dim1, dim2, int(time.Now().UnixNano()+int64(i*7))),
+		}
+	}
+	return pairs
 }
 
 func generateArrays() [][]int {
 	arrays := make([][]int, n)
-    for i := 0; i < n; i++ {
-        arrays[i] = matrix.MagicMatrix1D(dim1, int(time.Now().UnixNano()+int64(i*7)))
-    }
-    return arrays
+	for i := 0; i < n; i++ {
+		arrays[i] = matrix.MagicMatrix1D(dim1, int(time.Now().UnixNano()+int64(i*7)))
+	}
+	return arrays
 }
-
 
 // func measurePerformance(f func(a, b [][]int) [][]int) time.Duration {
 // 	total := time.Duration(0)
@@ -67,14 +65,14 @@ func generateArrays() [][]int {
 // }
 
 func measurePerformance(f func(a, b [][]int) [][]int, pairs []MatrixPair) time.Duration {
-    total := time.Duration(0)
-    for _, p := range pairs {
-        start := time.Now()
-        f(p.A, p.B)
-        elapsed := time.Since(start)
-        total += elapsed
-    }
-    return total / time.Duration(len(pairs))
+	total := time.Duration(0)
+	for _, p := range pairs {
+		start := time.Now()
+		f(p.A, p.B)
+		elapsed := time.Since(start)
+		total += elapsed
+	}
+	return total / time.Duration(len(pairs))
 }
 
 func measurePerformance1D(f func(a []int) []int, arrays [][]int) time.Duration {
@@ -91,11 +89,11 @@ func measurePerformance1D(f func(a []int) []int, arrays [][]int) time.Duration {
 }
 
 func getCacheInfo() (l1, l2, l3, lineSize int) {
-    l1 = cpuid.CPU.Cache.L1D
-    l2 = cpuid.CPU.Cache.L2
-    l3 = cpuid.CPU.Cache.L3
-    lineSize = cpuid.CPU.CacheLine
-    return
+	l1 = cpuid.CPU.Cache.L1D
+	l2 = cpuid.CPU.Cache.L2
+	l3 = cpuid.CPU.Cache.L3
+	lineSize = cpuid.CPU.CacheLine
+	return
 }
 
 func storeResults(filename string, data [][]string) error {
@@ -120,7 +118,6 @@ func fileExists(filename string) bool {
 	_, err := os.Stat(filename)
 	return err == nil || !os.IsNotExist(err)
 }
-
 
 //TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
@@ -360,7 +357,7 @@ func main() {
 		panic("P Merge Sort check failed")
 	}
 	runTime = measurePerformance1D(mergesort.PmergeSort, arrays)
-	log.Println("P Merge Sort speedup: ", float64(msBaseline.Nanoseconds())/float64(runTime.Nanoseconds()))
+	log.Println("P Merge Sort speedup: ", runTime.Nanoseconds())
 	log.Println("P Merge Sort check passed.")
 	result = []string{
 		time.Now().Format("2006-01-02 15:04:05"),
@@ -382,7 +379,7 @@ func main() {
 	// -----------------------------------------------------
 	// Store Results
 	// -----------------------------------------------------
-	err := storeResults("./data/" + filename + ".csv", results)
+	err := storeResults("./data/"+filename+".csv", results)
 	if err != nil {
 		log.Println("❌ Failed to write:", err)
 	} else {
