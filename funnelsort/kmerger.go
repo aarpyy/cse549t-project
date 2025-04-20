@@ -1,12 +1,33 @@
 package funnelsort
 
 import (
+	"container/heap"
 	"math"
 )
 
+type bufEntry struct {
+	val int
+	buf Buffer
+}
+
+// heap of *bufEntry
+type entryHeap []*bufEntry
+
+func (h entryHeap) Len() int            { return len(h) }
+func (h entryHeap) Less(i, j int) bool  { return h[i].val < h[j].val }
+func (h entryHeap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
+func (h *entryHeap) Push(x interface{}) { *h = append(*h, x.(*bufEntry)) }
+func (h *entryHeap) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[:n-1]
+	return x
+}
+
 type kmerger struct {
-	k  int
-	in []Buffer
+	in   []Buffer
+	heap entryHeap
 }
 
 func NewKMerger(arr [][]int) KMerger {
@@ -15,11 +36,10 @@ func NewKMerger(arr [][]int) KMerger {
 
 	if k < 512 {
 		in = make([]Buffer, k)
-		for i := 0; i < k; i++ {
+		for i := range arr {
 			in[i] = NewLeafBuffer(arr[i])
 		}
 	} else {
-		// Create sqrt(k) buffers/mergers
 		sqrtK := int(math.Sqrt(float64(k)))
 		in = make([]Buffer, sqrtK)
 		for i := 0; i < sqrtK; i++ {
@@ -30,14 +50,23 @@ func NewKMerger(arr [][]int) KMerger {
 				a = arr[i*sqrtK : (i+1)*sqrtK]
 			}
 			m := NewKMerger(a)
-			in[i] = NewBuffer(m) // Pass size k for buffer calculation
+			in[i] = NewBuffer(m)
 		}
 	}
 
-	return &kmerger{
-		k:  k,
-		in: in,
+	m := &kmerger{in: in}
+	m.initHeap()
+	return m
+}
+
+func (m *kmerger) initHeap() {
+	m.heap = make(entryHeap, 0, len(m.in))
+	for _, buf := range m.in {
+		if v, ok := buf.Peek(); ok {
+			m.heap = append(m.heap, &bufEntry{val: v, buf: buf})
+		}
 	}
+	heap.Init(&m.heap)
 }
 
 type KMerger interface {
@@ -45,31 +74,21 @@ type KMerger interface {
 	Size() int
 }
 
-func (m *kmerger) Size() int {
-	return m.k
-}
+func (m *kmerger) Size() int { return len(m.in) }
 
 func (m *kmerger) Next() (int, bool) {
-	var minVal int
-	minIndex := -1
-	hasValue := false
-
-	// Sequential access is more efficient than creating goroutines for each peek
-	for i, b := range m.in {
-		if v, ok := b.Peek(); ok {
-			if !hasValue || v < minVal {
-				minVal = v
-				minIndex = i
-				hasValue = true
-			}
-		}
-	}
-
-	if !hasValue {
+	if len(m.heap) == 0 {
 		return 0, false
 	}
+	// pop smallest
+	e := heap.Pop(&m.heap).(*bufEntry)
+	val := e.val
 
-	// Consume the top value
-	m.in[minIndex].Consume()
-	return minVal, true
+	// advance buffer; if more, push new entry
+	e.buf.Consume()
+	if v, ok := e.buf.Peek(); ok {
+		e.val = v
+		heap.Push(&m.heap, e)
+	}
+	return val, true
 }
