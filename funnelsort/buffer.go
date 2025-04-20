@@ -1,15 +1,19 @@
 package funnelsort
 
-import "sort"
+import (
+	"math"
+	"sort"
+)
 
 type leafbuffer struct {
 	arr []int
 }
 
 type buffer struct {
-	capacity int
-	in       KMerger
-	arr      []int
+	capacity      int
+	fillThreshold int
+	in            KMerger
+	arr           []int
 }
 
 func NewLeafBuffer(arr []int) Buffer {
@@ -17,26 +21,31 @@ func NewLeafBuffer(arr []int) Buffer {
 	return &leafbuffer{arr: arr}
 }
 
-func NewBuffer(capacity int, in KMerger) Buffer {
+func NewBuffer(in KMerger) Buffer {
+	k := in.Size()
+	// Calculate capacity as 2k^(3/2)
+	fillThreshold := int(math.Pow(float64(k), 1.5)) // Fill when less than k^(3/2) elements
+	capacity := 2 * fillThreshold
+
 	return &buffer{
-		capacity: capacity,
-		in:       in,
-		arr:      make([]int, 0, capacity),
+		capacity:      capacity,
+		fillThreshold: fillThreshold,
+		in:            in,
+		arr:           make([]int, 0, capacity),
 	}
 }
 
 type Buffer interface {
-	Next() (int, bool)
+	Consume()
 	Peek() (int, bool)
+	Fill()
 }
 
-func (b *leafbuffer) Next() (int, bool) {
+func (b *leafbuffer) Consume() {
 	if len(b.arr) == 0 {
-		return 0, false
+		return
 	}
-	v := b.arr[0]
 	b.arr = b.arr[1:]
-	return v, true
 }
 
 func (b *leafbuffer) Peek() (int, bool) {
@@ -46,9 +55,18 @@ func (b *leafbuffer) Peek() (int, bool) {
 	return b.arr[0], true
 }
 
-func (b *buffer) fill() {
-	// Try to fill from the input merger
-	for i := 0; i < b.capacity; i++ {
+func (b *leafbuffer) Fill() {
+	// Leaf buffers don't need filling
+}
+
+func (b *buffer) Fill() {
+	// Only fill if below threshold
+	if len(b.arr) >= b.fillThreshold {
+		return
+	}
+
+	// Fill up to capacity
+	for len(b.arr) < b.capacity {
 		v, ok := b.in.Next()
 		if !ok {
 			break
@@ -57,25 +75,21 @@ func (b *buffer) fill() {
 	}
 }
 
-func (b *buffer) Next() (int, bool) {
+func (b *buffer) Consume() {
 	if len(b.arr) == 0 {
-		b.fill()
-		if len(b.arr) == 0 {
-			return 0, false
-		}
+		return
 	}
-
-	v := b.arr[0]
 	b.arr = b.arr[1:]
-	return v, true
+
+	// Check if we need to fill
+	if len(b.arr) < b.fillThreshold {
+		b.Fill()
+	}
 }
 
 func (b *buffer) Peek() (int, bool) {
 	if len(b.arr) == 0 {
-		b.fill()
-		if len(b.arr) == 0 {
-			return 0, false
-		}
+		return 0, false
 	}
 
 	return b.arr[0], true

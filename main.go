@@ -6,6 +6,7 @@ import (
 	"cse549t-project/mergesort"
 	"log"
 	"runtime"
+	"sort"
 	"time"
 	"encoding/csv"
 	"os"
@@ -303,7 +304,7 @@ func main() {
 	// -----------------------------------------------------
 
 	// Sequential Merge Sort
-	d := matrix.MagicMatrix1D(512, 42)
+	d := matrix.MagicMatrix1D(1000000, 42)
 	e := mergesort.MergeSort(d)
 	if !mergesort.CheckSorted(d, e) {
 		panic("Seq. Merge Sort check failed")
@@ -359,7 +360,7 @@ func main() {
 		panic("P Merge Sort check failed")
 	}
 	runTime = measurePerformance1D(mergesort.PmergeSort, arrays)
-	log.Println("P Merge Sort running time: ", runTime.Nanoseconds())
+	log.Println("P Merge Sort speedup: ", float64(msBaseline.Nanoseconds())/float64(runTime.Nanoseconds()))
 	log.Println("P Merge Sort check passed.")
 	result = []string{
 		time.Now().Format("2006-01-02 15:04:05"),
@@ -380,11 +381,18 @@ func main() {
 
 	// -----------------------------------------------------
 	// Store Results
-	// -----------------------------------------------------		
+	// -----------------------------------------------------
 	err := storeResults("./data/" + filename + ".csv", results)
 	if err != nil {
 		log.Println("❌ Failed to write:", err)
 	} else {
 		log.Println("✅ Appended results to CSV.")
 	}
+
+	// ------------------------------------------------------
+	// Funnelsort
+	// ------------------------------------------------------
+
+	TestSpeedup()
+	TestCorrectness()
 }
