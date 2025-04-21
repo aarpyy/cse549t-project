@@ -26,4 +26,5 @@ axs[1].set_title("Speedup for Merge Sort")
 
 plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 plt.tight_layout()
+plt.savefig("graph.png", dpi=300, bbox_inches='tight')
 plt.show()
