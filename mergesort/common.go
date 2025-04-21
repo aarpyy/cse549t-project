@@ -1,5 +1,10 @@
 package mergesort
 
+const (
+	basecase = 1024
+	maxDepth = 4
+)
+
 func Merge(left, right []int) []int {
 	result := make([]int, 0, len(left)+len(right))
 	i, j := 0, 0
