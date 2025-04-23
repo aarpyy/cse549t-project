@@ -7,6 +7,7 @@ import (
 )
 
 // cache aware
+// k = z/l
 func multiWayMergeSort(A []int, k int) []int {
     // base case
     n := len(A)
