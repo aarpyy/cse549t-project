@@ -5,9 +5,6 @@ import (
 )
 
 func PmergeSort(A []int) []int {
-	if len(A) <= 1 {
-		return A
-	}
 
 	if len(A) <= basecase {
 		return MergeSort(A)
@@ -55,6 +52,11 @@ func Pmerge(A, B, C []int, startC int, depth int) {
 			C[startC] = B[0]
 			C[startC+1] = A[0]
 		}
+		return
+	}
+
+	if len(A)+len(B) <= basecaseMerge {
+		MergeC(A, B, C[startC:])
 		return
 	}
 

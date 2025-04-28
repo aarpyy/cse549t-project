@@ -1,8 +1,13 @@
 package mergesort
 
+import "sort"
+
 func MergeSort(A []int) []int {
-	if len(A) <= 1 {
-		return A
+	if len(A) <= basecase {
+		cpy := make([]int, len(A))
+		copy(cpy, A)
+		sort.Ints(cpy)
+		return cpy
 	}
 
 	mid := len(A) / 2

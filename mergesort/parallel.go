@@ -5,9 +5,6 @@ import (
 )
 
 func ParMergeSort(A []int) []int {
-	if len(A) <= 1 {
-		return A
-	}
 
 	if len(A) <= basecase {
 		return MergeSort(A)
