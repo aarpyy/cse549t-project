@@ -37,9 +37,9 @@ import (
 // 30720
 const (
 	n        = 50
-	dim1     = 30720
-	dim2     = 30720
-	dim3     = 30720
+	dim1     = 32768
+	dim2     = 32768
+	dim3     = 32768
 	filename = "olivia-pc-2"
 )
 

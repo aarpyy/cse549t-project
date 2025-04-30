@@ -3,8 +3,8 @@ package mergesort
 const (
 	basecase           = 4096
 	maxDepth           = 4
-	k                  = 16
-	basecaseCacheAware = 4096
+	k                  = 8
+	basecaseCacheAware = 8196
 	basecaseMerge      = 4096
 )
 
