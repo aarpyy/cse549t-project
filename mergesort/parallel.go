@@ -5,8 +5,9 @@ import (
 )
 
 func ParMergeSort(A []int) []int {
-	if len(A) <= 1 {
-		return A
+
+	if len(A) <= basecase {
+		return MergeSort(A)
 	}
 
 	mid := len(A) / 2
@@ -17,13 +18,13 @@ func ParMergeSort(A []int) []int {
 
 	// Sort left half in a goroutine
 	go func() {
-		left = MergeSort(A[:mid])
+		left = ParMergeSort(A[:mid])
 		wg.Done()
 	}()
 
 	// Sort right half in a goroutine
 	go func() {
-		right = MergeSort(A[mid:])
+		right = ParMergeSort(A[mid:])
 		wg.Done()
 	}()
 

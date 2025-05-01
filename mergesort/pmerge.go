@@ -5,57 +5,59 @@ import (
 	"sync"
 )
 
-// Entry point
-func PmergeSort(arr []int) []int {
-	if len(arr) <= 1 {
-		cpy := make([]int, len(arr))
-		copy(cpy, arr)
-		sort.Ints(cpy)
-		return cpy
+func PmergeSort(A []int) []int {
+
+	if len(A) <= basecase {
+		return MergeSort(A)
 	}
 
-	output := make([]int, len(arr))
+	mid := len(A) / 2
+	var left, right []int
+
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go pmergeSort(arr, output, &wg)
+	wg.Add(2)
+
+	// Sort left half in a goroutine
+	go func() {
+		left = PmergeSort(A[:mid])
+		wg.Done()
+	}()
+
+	// Sort right half in a goroutine
+	go func() {
+		right = PmergeSort(A[mid:])
+		wg.Done()
+	}()
+
 	wg.Wait()
-	return output
+
+	C := make([]int, len(A))
+	Pmerge(left, right, C, 0, 0)
+	return C
 }
 
-// Internal recursive parallel mergesort
-func pmergeSort(arr []int, output []int, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	n := len(arr)
-	if n <= 1 {
-		copy(output, arr)
-		return
-	}
-
-	mid := n / 2
-	left := make([]int, mid)
-	right := make([]int, n-mid)
-
-	var wgInner sync.WaitGroup
-	wgInner.Add(2)
-	go pmergeSort(arr[:mid], left, &wgInner)
-	go pmergeSort(arr[mid:], right, &wgInner)
-	wgInner.Wait()
-
-	wgInner.Add(1)
-	go Pmerge(left, right, output, 0, &wgInner)
-	wgInner.Wait()
-}
-
-func Pmerge(A, B, C []int, startC int, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func Pmerge(A, B, C []int, startC int, depth int) {
 	if len(A) == 0 {
 		copy(C[startC:], B)
 		return
 	}
 	if len(B) == 0 {
 		copy(C[startC:], A)
+		return
+	}
+	if len(A) == 1 && len(B) == 1 {
+		if A[0] <= B[0] {
+			C[startC] = A[0]
+			C[startC+1] = B[0]
+		} else {
+			C[startC] = B[0]
+			C[startC+1] = A[0]
+		}
+		return
+	}
+
+	if len(A)+len(B) <= basecaseMerge {
+		MergeC(A, B, C[startC:])
 		return
 	}
 
@@ -65,16 +67,23 @@ func Pmerge(A, B, C []int, startC int, wg *sync.WaitGroup) {
 
 	midA := len(A) / 2
 	val := A[midA]
-
 	posB := binarySearch(B, val)
 	posC := midA + posB
 	C[startC+posC] = val
 
-	var wgInner sync.WaitGroup
-	wgInner.Add(2)
-	go Pmerge(A[:midA], B[:posB], C, startC, &wgInner)
-	go Pmerge(A[midA+1:], B[posB:], C, startC+posC+1, &wgInner)
-	wgInner.Wait()
+	if depth <= maxDepth {
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() {
+			Pmerge(A[:midA], B[:posB], C, startC, depth+1)
+			wg.Done()
+		}()
+		Pmerge(A[midA+1:], B[posB:], C, startC+posC+1, depth+1)
+		wg.Wait()
+	} else {
+		Pmerge(A[:midA], B[:posB], C, startC, depth+1)
+		Pmerge(A[midA+1:], B[posB:], C, startC+posC+1, depth+1)
+	}
 }
 
 func binarySearch(arr []int, val int) int {
