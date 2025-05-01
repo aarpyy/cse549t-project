@@ -5,7 +5,7 @@ const (
 	maxDepth           = 4
 	k                  = 8
 	basecaseCacheAware = 8196
-	basecaseMerge      = 4096
+	basecaseMerge      = 8196
 )
 
 func Merge(left, right []int) []int {

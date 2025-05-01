@@ -72,12 +72,15 @@ func Pmerge(A, B, C []int, startC int, depth int) {
 
 	if depth <= maxDepth {
 		var wg sync.WaitGroup
-		wg.Add(1)
+		wg.Add(2)
 		go func() {
 			Pmerge(A[:midA], B[:posB], C, startC, depth+1)
 			wg.Done()
 		}()
-		Pmerge(A[midA+1:], B[posB:], C, startC+posC+1, depth+1)
+		go func() {
+			Pmerge(A[midA+1:], B[posB:], C, startC+posC+1, depth+1)
+			wg.Done()
+		}()
 		wg.Wait()
 	} else {
 		Pmerge(A[:midA], B[:posB], C, startC, depth+1)

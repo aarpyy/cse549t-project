@@ -43,7 +43,7 @@ const (
 	// dim1     = 32768
 	// dim2     = 32768
 	// dim3     = 32768
-	filename = "olivia-laptop-2"
+	filename = "olivia-laptop-3"
 )
 
 type MatrixPair struct {
@@ -141,8 +141,9 @@ func main() {
 	}
 
 	sizes := [8]int { 4096, 8192, 12288, 16384, 24576, 32768, 49152, 65536 }
+	// sizes := [1]int { 32768 }
 
-	for j := 0; j < 10; j++ {
+	for j := 0; j < 50; j++ {
 
 		log.Println("\n-----------------------")
 		log.Println("iteration: ", j)
