@@ -25,7 +25,7 @@ func MagicMatrix1D(n, seed int) []int {
 	// Create random matrix of size n
 	matrix := make([]int, n)
 	for i := range matrix {
-		matrix[i] = rnd.Intn(100) // Random number between 0 and 99
+		matrix[i] = rnd.Intn(n) // Random number between 0 and 99
 	}
 
 	return matrix

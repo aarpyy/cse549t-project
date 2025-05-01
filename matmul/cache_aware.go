@@ -10,6 +10,9 @@ func ComputeBlockSize(cacheSize string) int {
 			z = z*10 + int(cacheSize[i]-'0')
 		} else {
 			switch cacheSize[i] {
+			case 'B':
+				// Ignore bytes
+				continue
 			case 'K':
 				z *= 1024
 			case 'M':

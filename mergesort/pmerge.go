@@ -1,13 +1,17 @@
 package mergesort
 
 import (
+	"sort"
 	"sync"
 )
 
 // Entry point
 func PmergeSort(arr []int) []int {
 	if len(arr) <= 1 {
-		return arr
+		cpy := make([]int, len(arr))
+		copy(cpy, arr)
+		sort.Ints(cpy)
+		return cpy
 	}
 
 	output := make([]int, len(arr))
@@ -85,4 +89,3 @@ func binarySearch(arr []int, val int) int {
 	}
 	return low
 }
-

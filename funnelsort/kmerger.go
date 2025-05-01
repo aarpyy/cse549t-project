@@ -13,7 +13,7 @@ type kmerger struct {
 func NewKMerger(arr [][]int) KMerger {
 	k := len(arr)
 	var in []Buffer
-	if k < 1020 {
+	if k < 1000 {
 		in = make([]Buffer, k)
 		for i := range arr {
 			in[i] = NewLeafBuffer(arr[i])

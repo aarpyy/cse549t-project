@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	s          = 1000000
-	iterations = 100
+	s          = 1024 * 1024
+	iterations = 1
 )
 
 var rnd = rand.New(rand.NewSource(42))
@@ -52,5 +52,5 @@ func TestSpeedup() {
 		fs += time.Since(start)
 	}
 
-	log.Printf("Average speedup: %.4f", float64(base)/float64(fs))
+	log.Printf("Average speedup: %.4f", float64(base.Nanoseconds())/float64(fs.Nanoseconds()))
 }
