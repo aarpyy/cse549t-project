@@ -2,14 +2,14 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-filename = "olivia-pc-2"
+filename = "olivia-laptop"
 
 # Load CSV data
 df = pd.read_csv("data/" + filename + ".csv")
 
 # Set up the subplot grid (2 rows, 2 columns)
 fig, axs = plt.subplots(1, 1, figsize=(8, 5))
-sns.set(style="whitegrid")
+sns.set_style('whitegrid')
 
 # --- Speedup across Array Sizes ---
 # df_MM = df[df["Algorithm"].str.contains("MM")]
@@ -18,7 +18,7 @@ sns.set(style="whitegrid")
 
 # --- Speedup for MergeSort ---
 df_MS = df[df["Algorithm"].str.contains("MS")]
-sns.lineplot(data=df_MS, x="ArraySizeA", y="Speedup", hue="Algorithm", marker="o", ax=axs)
+sns.lineplot(data=df_MS, x="ArraySizeA", y="Speedup", hue="Algorithm", marker="o", ax=axs, errorbar=None)
 axs.set_title("Speedup for Merge Sort")
 
 plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))

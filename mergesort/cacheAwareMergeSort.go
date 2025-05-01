@@ -3,36 +3,7 @@ package mergesort
 import (
 	"math"
 	"math/rand"
-	"sync"
 )
-
-func ParMultiWayMergeSort(A []int) []int {
-	n := len(A)
-	if n <= basecaseCacheAware {
-		return MergeSort(A)
-	}
-
-	partSize := (n + k - 1) / k
-	parts := make([][]int, k)
-	var wg sync.WaitGroup
-
-	for i := 0; i < k; i++ {
-		start := i * partSize
-		end := min((i+1)*partSize, n)
-		if start >= n {
-			break
-		}
-
-		wg.Add(1)
-		go func(i, start, end int) {
-			defer wg.Done()
-			parts[i] = MultiWayMergeSort(A[start:end])
-		}(i, start, end)
-	}
-
-	wg.Wait()
-	return multiWayMerge(parts)
-}
 
 // cache aware
 // k = z/l

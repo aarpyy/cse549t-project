@@ -16,13 +16,13 @@ func PmergeSort(A []int) []int {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
-	// Sort left half in a goroutine
+	// Sort left half
 	go func() {
 		left = PmergeSort(A[:mid])
 		wg.Done()
 	}()
 
-	// Sort right half in a goroutine
+	// Sort right half
 	go func() {
 		right = PmergeSort(A[mid:])
 		wg.Done()
