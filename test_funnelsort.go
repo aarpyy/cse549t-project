@@ -35,22 +35,27 @@ func TestCorrectness() {
 }
 
 func TestSpeedup() {
-	// Compare to sort.Ints from average of 100 runs
-	var base time.Duration
-	for i := 0; i < iterations; i++ {
-		arr := randomArray(s)
-		start := time.Now()
-		sort.Ints(arr)
-		base += time.Since(start)
-	}
+	sizes := [7]int { 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304 }
+	
+	for k := 0; k < len(sizes); k++ {
+		// Compare to sort.Ints from average of 100 runs
+		var base time.Duration
+		for i := 0; i < iterations; i++ {
+			arr := randomArray(sizes[k])
+			start := time.Now()
+			sort.Ints(arr)
+			base += time.Since(start)
+		}
 
-	var fs time.Duration
-	for i := 0; i < iterations; i++ {
-		arr := randomArray(s)
-		start := time.Now()
-		funnelsort.Sort(arr)
-		fs += time.Since(start)
-	}
+		var fs time.Duration
+		for i := 0; i < iterations; i++ {
+			arr := randomArray(sizes[k])
+			start := time.Now()
+			funnelsort.Sort(arr)
+			fs += time.Since(start)
+		}
 
-	log.Printf("Average speedup: %.4f", float64(base)/float64(fs))
+		// arraysize, speedup
+		log.Printf("%d,%.4f", sizes[k], float64(base)/float64(fs))
+	}
 }
